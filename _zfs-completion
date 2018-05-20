@@ -1,0 +1,39 @@
+#compdef zfs
+#autoload
+#zfs zsh completion
+
+local -a _1st_arguments
+_1st_arguments=(
+  'create:create filesystem|volume'
+  'destroy:destroy filesystem|volume|snap'
+  'snapshot:create filesystem@snapname|volume@snapname'
+  'rollback:rollback snapshot'
+  'clone:clone snapshot filesystem|volume'
+  'rename:rename filesystem|volume|snapshot'
+  'list:list filesystem|volume|snapshot'
+  'set:set property'
+  'get:get property'
+  'send:send filesystem|volume|snapshot'
+  'receive:receive filesystem|volume|snapshot'
+)
+
+_arguments \
+  '*:: :->subcmds' && return 0
+
+if (( CURRENT == 1 )); then
+  _describe -t commands "zfs subcommand" _1st_arguments
+  return
+fi
+
+case "$words[1]" in
+  get)
+    compadd "$@" compression xattr
+  ;;
+  set)
+    _values 'description' \
+    'compression[i.e. zfs set compression=lz4 dataset]:::(on off lz4)' \
+    'shareiscsi[i.e. zfs set shareiscsi=on dataset]:::(on off)' \
+    'sharenfs[i.e. zfs set sharenfs=on dataset]:::(on off)' \
+    'sharesmb[i.e. zfs set sharesmb=on dataset]:::(on off)' \
+    'xattr[i.e. zfs set xattr=sa dataset]:::(on off sa)'
+esac
